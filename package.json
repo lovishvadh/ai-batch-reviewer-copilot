@@ -1,0 +1,29 @@
+{
+  "name": "code-review-generator",
+  "version": "1.0.0",
+  "description": "Generate VS Code Copilot prompts for automated code reviews",
+  "main": "code-review-generator.js",
+  "bin": {
+    "code-review": "./code-review-generator.js"
+  },
+  "scripts": {
+    "start": "node code-review-generator.js",
+    "review": "node code-review-generator.js",
+    "review:main": "node code-review-generator.js main",
+    "review:develop": "node code-review-generator.js develop"
+  },
+  "keywords": [
+    "code-review",
+    "git",
+    "copilot",
+    "automation",
+    "vscode"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
