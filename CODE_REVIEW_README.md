@@ -18,6 +18,19 @@ A Node.js script that generates well-structured code review prompts for VS Code 
 2. Make sure you have Node.js installed (version 14 or higher)
 3. Navigate to your project directory
 
+## Usage
+
+### Basic Usage
+```bash
+# Compare current branch with develop
+node code-review-generator.js
+
+# Compare current branch with main
+node code-review-generator.js main
+
+# Compare current branch with any base branch
+node code-review-generator.js feature/old-branch
+```
 
 ### Using npm scripts (if you have package.json)
 ```bash
