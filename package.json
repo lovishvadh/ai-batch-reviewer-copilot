@@ -1,29 +1,45 @@
 {
-  "name": "code-review-generator",
-  "version": "1.0.0",
-  "description": "Generate VS Code Copilot prompts for automated code reviews",
-  "main": "code-review-generator.js",
+  "name": "copilot-code-reviewer",
+  "version": "1.2.0",
+  "description": "Generate VS Code Copilot prompts for automated code reviews by comparing git branches",
+  "main": "dist/index.js",
   "bin": {
-    "code-review": "./code-review-generator.js"
+    "copilot-review": "./dist/cli.js"
   },
   "scripts": {
-    "start": "node code-review-generator.js",
-    "review": "node code-review-generator.js",
-    "review:main": "node code-review-generator.js main",
-    "review:develop": "node code-review-generator.js develop"
+    "build": "node build.js",
+    "start": "node dist/cli.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "code-review",
     "git",
     "copilot",
     "automation",
-    "vscode"
+    "vscode",
+    "github",
+    "pull-request",
+    "code-analysis"
   ],
-  "author": "Your Name",
+  "author": "Your Name <your.email@example.com>",
   "license": "MIT",
   "engines": {
     "node": ">=14.0.0"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/copilot-code-reviewer.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/copilot-code-reviewer/issues"
+  },
+  "homepage": "https://github.com/yourusername/copilot-code-reviewer#readme",
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
   "dependencies": {},
   "devDependencies": {}
 }
