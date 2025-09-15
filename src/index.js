@@ -261,6 +261,107 @@ ${commits.map(commit => `- ${commit.hash}: ${commit.message}`).join('\n')}
     }
 
     /**
+     * Generate PR description prompt
+     */
+    generatePRDescriptionPrompt(commits, changedFiles, baseBranch, currentBranch) {
+        const fileTypes = this.analyzeFileTypes(changedFiles);
+        const commitMessages = commits.map(commit => commit.message).join(', ');
+        
+        return `# Pull Request Description Generator
+
+## Context
+Please generate a comprehensive Pull Request description for the following changes.
+
+## Branch Information:
+- **Source Branch**: ${currentBranch}
+- **Target Branch**: ${baseBranch}
+- **Total Commits**: ${commits.length}
+- **Total Files Changed**: ${changedFiles.length}
+
+## Commits:
+${commits.map(commit => `- ${commit.hash}: ${commit.message}`).join('\n')}
+
+## File Changes Summary:
+${fileTypes.map(type => `- ${type.type}: ${type.count} files`).join('\n')}
+
+## Changed Files:
+${changedFiles.map(file => `- ${file}`).join('\n')}
+
+## Instructions:
+Please generate a professional Pull Request description that includes:
+
+1. **Title**: A clear, concise title (max 50 characters)
+
+2. **Description**: A comprehensive description including:
+   - **What**: What changes were made
+   - **Why**: Why these changes were necessary
+   - **How**: How the changes were implemented
+   - **Impact**: What impact these changes will have
+
+3. **Type of Changes**: Categorize the changes (e.g., feature, bugfix, refactor, docs, etc.)
+
+4. **Testing**: Suggest what testing should be done
+
+5. **Breaking Changes**: Note any breaking changes (if applicable)
+
+6. **Dependencies**: Note any new dependencies or changes to existing ones
+
+7. **Screenshots/Demos**: Suggest if screenshots or demos would be helpful
+
+8. **Checklist**: Provide a checklist for reviewers
+
+Please format the output as a proper GitHub PR description with appropriate markdown formatting.`;
+    }
+
+    /**
+     * Analyze file types in changed files
+     */
+    analyzeFileTypes(changedFiles) {
+        const typeMap = {};
+        
+        changedFiles.forEach(file => {
+            const extension = path.extname(file).toLowerCase();
+            let type = 'Other';
+            
+            if (['.js', '.ts', '.jsx', '.tsx'].includes(extension)) {
+                type = 'JavaScript/TypeScript';
+            } else if (['.py'].includes(extension)) {
+                type = 'Python';
+            } else if (['.java'].includes(extension)) {
+                type = 'Java';
+            } else if (['.go'].includes(extension)) {
+                type = 'Go';
+            } else if (['.rs'].includes(extension)) {
+                type = 'Rust';
+            } else if (['.php'].includes(extension)) {
+                type = 'PHP';
+            } else if (['.rb'].includes(extension)) {
+                type = 'Ruby';
+            } else if (['.css', '.scss', '.sass', '.less'].includes(extension)) {
+                type = 'Stylesheets';
+            } else if (['.html', '.htm'].includes(extension)) {
+                type = 'HTML';
+            } else if (['.json', '.yaml', '.yml', '.xml'].includes(extension)) {
+                type = 'Configuration';
+            } else if (['.md', '.txt', '.rst'].includes(extension)) {
+                type = 'Documentation';
+            } else if (['.sql'].includes(extension)) {
+                type = 'SQL';
+            } else if (['.sh', '.bash', '.zsh'].includes(extension)) {
+                type = 'Shell Scripts';
+            } else if (['.dockerfile', 'dockerfile'].includes(extension.toLowerCase())) {
+                type = 'Docker';
+            } else if (['.yml', '.yaml'].includes(extension) && file.includes('github/workflows')) {
+                type = 'GitHub Actions';
+            }
+            
+            typeMap[type] = (typeMap[type] || 0) + 1;
+        });
+        
+        return Object.entries(typeMap).map(([type, count]) => ({ type, count }));
+    }
+
+    /**
      * Save prompt to file
      */
     savePrompt(content, filename) {
@@ -277,14 +378,22 @@ ${commits.map(commit => `- ${commit.hash}: ${commit.message}`).join('\n')}
     /**
      * Generate instructions file
      */
-    generateInstructions(batches, summaryPath, batchPaths) {
+    generateInstructions(batches, summaryPath, batchPaths, prDescriptionPath) {
         const instructions = `# Code Review Instructions
 
 ## Generated Files:
 - Summary: ${path.basename(summaryPath)}
+- PR Description: ${path.basename(prDescriptionPath)}
 - Batches: ${batchPaths.map(p => path.basename(p)).join(', ')}
 
 ## How to Use:
+
+### 1. Generate PR Description (Optional but Recommended)
+1. Open the PR description file in VS Code
+2. Copy the prompt content and paste it into Copilot chat
+3. Use the generated description for your Pull Request
+
+### 2. Code Review Process
 1. Open each batch file in VS Code
 2. Use Copilot to review the code changes
 3. Copy the prompt content and paste it into Copilot chat
@@ -292,6 +401,7 @@ ${commits.map(commit => `- ${commit.hash}: ${commit.message}`).join('\n')}
 5. Move to the next batch
 
 ## Tips:
+- Start with the PR description to get a high-level overview
 - Review batches in order for better context
 - Focus on one batch at a time for detailed feedback
 - Use the summary to understand the overall scope
@@ -348,6 +458,11 @@ ${batches.map((batch, i) => `
         const summaryPath = this.savePrompt(summaryPrompt, `summary-${timestamp}.md`);
         console.log(`📋 Summary saved: ${summaryPath}`);
 
+        // Save PR description prompt
+        const prDescriptionPrompt = this.generatePRDescriptionPrompt(commits, changedFiles, baseBranch, currentBranch);
+        const prDescriptionPath = this.savePrompt(prDescriptionPrompt, `pr-description-${timestamp}.md`);
+        console.log(`📝 PR Description prompt saved: ${prDescriptionPath}`);
+
         // Save individual batch prompts
         const batchPaths = [];
         for (let i = 0; i < batches.length; i++) {
@@ -359,7 +474,7 @@ ${batches.map((batch, i) => `
         }
 
         // Generate and save instructions
-        const instructions = this.generateInstructions(batches, summaryPath, batchPaths);
+        const instructions = this.generateInstructions(batches, summaryPath, batchPaths, prDescriptionPath);
         const instructionsPath = this.savePrompt(instructions, `instructions-${timestamp}.md`);
         console.log(`📖 Instructions saved: ${instructionsPath}\n`);
 
