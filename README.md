@@ -44,6 +44,9 @@ npx copilot-review feature/old-branch
 npx copilot-review main --keep-old
 npx copilot-review -k
 
+# Skip .gitignore update
+npx copilot-review main --no-gitignore
+
 # Show help
 npx copilot-review --help
 ```
@@ -62,6 +65,9 @@ copilot-review feature/old-branch
 # Keep old files (skip cleanup)
 copilot-review main --keep-old
 copilot-review -k
+
+# Skip .gitignore update
+copilot-review main --no-gitignore
 
 # Show help
 copilot-review --help
@@ -89,17 +95,18 @@ npm run review:develop
 
 ## How It Works
 
-1. **Cleanup**: Automatically removes old prompt files (unless `--keep-old` is used)
-2. **Branch Detection**: Automatically detects your current branch
-3. **Commit Extraction**: Gets all commits between your branch and the base branch
-4. **File Analysis**: Identifies all changed files and their diffs
-5. **File Type Analysis**: Categorizes files by type (JS/TS, Python, Java, etc.)
-6. **Smart Batching**: Groups files into manageable batches based on:
+1. **Gitignore Management**: Automatically adds `code-review-prompts/` to `.gitignore` (unless `--no-gitignore` is used)
+2. **Cleanup**: Automatically removes old prompt files (unless `--keep-old` is used)
+3. **Branch Detection**: Automatically detects your current branch
+4. **Commit Extraction**: Gets all commits between your branch and the base branch
+5. **File Analysis**: Identifies all changed files and their diffs
+6. **File Type Analysis**: Categorizes files by type (JS/TS, Python, Java, etc.)
+7. **Smart Batching**: Groups files into manageable batches based on:
    - Maximum 5 files per batch
    - Maximum 2000 lines per batch
    - Maximum 1000 lines per file
-7. **Prompt Generation**: Creates structured prompts for VS Code Copilot
-8. **File Output**: Saves all prompts in `./code-review-prompts/` directory
+8. **Prompt Generation**: Creates structured prompts for VS Code Copilot
+9. **File Output**: Saves all prompts in `./code-review-prompts/` directory
 
 ## Output Files
 
@@ -190,6 +197,8 @@ The script automatically excludes:
 6. **Team Workflow**: Share the generated prompts with team members for collaborative review
 7. **Clean Output**: The tool automatically cleans up old files, keeping your workspace organized
 8. **Keep Old Files**: Use `--keep-old` flag if you want to preserve previous prompt files
+9. **Gitignore Management**: The tool automatically adds `code-review-prompts/` to `.gitignore` to prevent accidental commits
+10. **Skip Gitignore**: Use `--no-gitignore` flag if you want to manage `.gitignore` manually
 
 ## Troubleshooting
 
@@ -210,6 +219,7 @@ The script automatically excludes:
 ```
 🚀 Starting Copilot Code Review Generator...
 
+📝 Added 'code-review-prompts/' to .gitignore
 🧹 Cleaning up 5 old prompt files...
 ✅ Cleaned up old files
 
@@ -248,6 +258,12 @@ The script automatically excludes:
 MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Changelog
+
+### 1.3.0
+- Added automatic .gitignore management for `code-review-prompts/` directory
+- Added `--no-gitignore` flag to skip .gitignore updates
+- Enhanced git integration to prevent accidental commits of generated files
+- Improved repository hygiene with automatic gitignore management
 
 ### 1.2.0
 - Added automatic cleanup of old prompt files

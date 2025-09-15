@@ -24,6 +24,7 @@ Arguments:
 
 Options:
   --keep-old, -k    Keep old prompt files instead of cleaning them up
+  --no-gitignore    Skip adding code-review-prompts/ to .gitignore
   --help, -h        Show this help message
 
 Examples:
@@ -31,6 +32,7 @@ Examples:
   copilot-review main               # Compare with main branch
   copilot-review feature/old-branch # Compare with specific branch
   copilot-review main --keep-old    # Compare with main, keep old files
+  copilot-review main --no-gitignore # Compare with main, skip .gitignore update
   copilot-review -h                 # Show help
 
 Features:
@@ -38,6 +40,7 @@ Features:
   • Creates PR description prompts
   • Smart batching for large changes
   • Automatic cleanup of old files
+  • Automatic .gitignore management
   • File type analysis and categorization
 `);
     }
@@ -50,12 +53,13 @@ Features:
         
         // Check for flags
         const skipCleanup = args.includes('--keep-old') || args.includes('-k');
+        const skipGitignore = args.includes('--no-gitignore');
         
         // Filter out flags to get the base branch
         const baseBranch = args.find(arg => !arg.startsWith('--') && !arg.startsWith('-')) || 'develop';
         const currentBranch = this.getCurrentBranch();
         
-        return { baseBranch, currentBranch, skipCleanup };
+        return { baseBranch, currentBranch, skipCleanup, skipGitignore };
     }
 
     /**
@@ -400,6 +404,43 @@ Please format the output as a proper GitHub PR description with appropriate mark
     }
 
     /**
+     * Ensure code-review-prompts is in .gitignore
+     */
+    ensureGitignoreEntry() {
+        const gitignorePath = '.gitignore';
+        const entry = 'code-review-prompts/';
+        
+        try {
+            let gitignoreContent = '';
+            let needsUpdate = false;
+            
+            // Read existing .gitignore if it exists
+            if (fs.existsSync(gitignorePath)) {
+                gitignoreContent = fs.readFileSync(gitignorePath, 'utf8');
+                
+                // Check if the entry already exists
+                if (!gitignoreContent.includes(entry)) {
+                    needsUpdate = true;
+                }
+            } else {
+                needsUpdate = true;
+            }
+            
+            if (needsUpdate) {
+                // Add the entry to .gitignore
+                const newContent = gitignoreContent + 
+                    (gitignoreContent && !gitignoreContent.endsWith('\n') ? '\n' : '') +
+                    `# Copilot Code Reviewer generated files\n${entry}\n`;
+                
+                fs.writeFileSync(gitignorePath, newContent);
+                console.log(`📝 Added '${entry}' to .gitignore`);
+            }
+        } catch (error) {
+            console.warn(`⚠️  Warning: Could not update .gitignore: ${error.message}`);
+        }
+    }
+
+    /**
      * Clean up old prompt files
      */
     cleanupOldFiles() {
@@ -503,7 +544,12 @@ ${batches.map((batch, i) => `
 
         console.log('🚀 Starting Copilot Code Review Generator...\n');
 
-        const { baseBranch, currentBranch, skipCleanup } = this.getArguments();
+        const { baseBranch, currentBranch, skipCleanup, skipGitignore } = this.getArguments();
+
+        // Ensure .gitignore entry exists (unless skipped)
+        if (!skipGitignore) {
+            this.ensureGitignoreEntry();
+        }
 
         // Clean up old files first (unless skipped)
         if (!skipCleanup) {
