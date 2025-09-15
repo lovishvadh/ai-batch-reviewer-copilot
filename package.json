@@ -1,6 +1,6 @@
 {
   "name": "copilot-code-reviewer",
-  "version": "1.3.0",
+  "version": "1.5.0",
   "description": "Generate VS Code Copilot prompts for automated code reviews by comparing git branches",
   "main": "dist/index.js",
   "bin": {

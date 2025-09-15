@@ -245,34 +245,127 @@ ${file.diff}
 `).join('\n')}
 
 ## Review Instructions:
-Please provide a comprehensive code review focusing on:
+Please provide a comprehensive code review with the following structure:
 
-1. **Code Quality**: 
-   - Code readability and maintainability
-   - Adherence to best practices
-   - Potential bugs or logic errors
+### 1. **Overall Assessment**
+- Brief summary of the changes
+- General code quality assessment
+- High-level concerns or positive aspects
 
-2. **Security**: 
-   - Security vulnerabilities
-   - Input validation
-   - Authentication/authorization issues
+### 2. **Detailed Review**
+For each issue found, provide:
+- **Location**: File name and line number(s)
+- **Issue**: Clear description of the problem
+- **Severity**: 🔴 **MUST FIX** or 🟡 **NITPICK**
+- **Current Code**: Show the problematic code
+- **Suggested Fix**: Provide improved code example
+- **Why This Improves**: Explain the benefits of the suggested change
 
-3. **Performance**: 
-   - Performance bottlenecks
-   - Memory leaks
-   - Inefficient algorithms
+### 3. **Review Categories**
 
-4. **Architecture**: 
-   - Design patterns
-   - Separation of concerns
-   - Code organization
+#### **🔴 Code Quality (MUST FIX)**
+- Critical bugs or logic errors
+- Security vulnerabilities
+- Performance issues that could cause problems
+- Code that will break in production
 
-5. **Testing**: 
-   - Test coverage
-   - Edge cases
-   - Test quality
+#### **🟡 Code Quality (NITPICK)**
+- Code style and formatting
+- Minor optimizations
+- Code readability improvements
+- Best practice suggestions
 
-Please provide specific, actionable feedback with line numbers where applicable.`;
+#### **🔴 Security (MUST FIX)**
+- Input validation issues
+- Authentication/authorization problems
+- Data exposure risks
+- SQL injection or XSS vulnerabilities
+
+#### **🟡 Security (NITPICK)**
+- Security best practices
+- Minor security improvements
+- Logging sensitive data
+
+#### **🔴 Performance (MUST FIX)**
+- Memory leaks
+- Infinite loops
+- Blocking operations
+- Database N+1 queries
+
+#### **🟡 Performance (NITPICK)**
+- Minor optimizations
+- Unnecessary computations
+- Code efficiency improvements
+
+#### **🔴 Architecture (MUST FIX)**
+- Violation of separation of concerns
+- Tight coupling issues
+- Missing error handling
+- Inconsistent patterns
+
+#### **🟡 Architecture (NITPICK)**
+- Design pattern suggestions
+- Code organization improvements
+- Refactoring opportunities
+
+#### **🔴 Testing (MUST FIX)**
+- Missing critical tests
+- Tests that don't cover edge cases
+- Broken or flaky tests
+
+#### **🟡 Testing (NITPICK)**
+- Additional test coverage
+- Test quality improvements
+- Test organization
+
+### 4. **Action Items Summary**
+At the end, provide a clear summary with:
+
+#### **🔴 MUST FIX (Critical Issues)**
+List all critical issues that must be addressed before merge:
+- [ ] **Issue 1**: Brief description with file:line reference
+- [ ] **Issue 2**: Brief description with file:line reference
+
+#### **🟡 NITPICK (Optional Improvements)**
+List all optional improvements:
+- [ ] **Improvement 1**: Brief description with file:line reference
+- [ ] **Improvement 2**: Brief description with file:line reference
+
+### 5. **Code Examples Format**
+For each issue, use this format:
+
+\`\`\`markdown
+**🔴 MUST FIX - [Category]**
+**File**: \`filename.js:line-number\`
+**Issue**: Brief description of the problem
+
+**Current Code:**
+\`\`\`javascript
+// Show the problematic code here
+const badCode = "example";
+\`\`\`
+
+**Suggested Fix:**
+\`\`\`javascript
+// Show the improved code here
+const goodCode = "example";
+\`\`\`
+
+**Why This Improves:**
+- Explain the specific benefits
+- Mention potential issues avoided
+- Reference best practices or standards
+\`\`\`
+
+### 6. **Positive Feedback**
+Also highlight:
+- Good practices implemented
+- Well-written code sections
+- Creative solutions
+- Proper error handling
+- Good test coverage
+
+Please provide specific, actionable feedback with clear categorization and code examples for all suggestions.`;
 
         return prompt;
     }
@@ -330,29 +423,79 @@ ${fileTypes.map(type => `- ${type.type}: ${type.count} files`).join('\n')}
 ${changedFiles.map(file => `- ${file}`).join('\n')}
 
 ## Instructions:
-Please generate a professional Pull Request description that includes:
+Please generate a professional Pull Request description that includes ALL of the following sections:
 
-1. **Title**: A clear, concise title (max 50 characters)
+### 1. **Title**: 
+A clear, concise title (max 50 characters)
 
-2. **Description**: A comprehensive description including:
-   - **What**: What changes were made
-   - **Why**: Why these changes were necessary
-   - **How**: How the changes were implemented
-   - **Impact**: What impact these changes will have
+### 2. **Summary of Changes**: 
+- **What**: What was changed and why?
+- **Why**: Why these changes were necessary
+- **Business Value**: What business problem does this solve?
 
-3. **Type of Changes**: Categorize the changes (e.g., feature, bugfix, refactor, docs, etc.)
+### 3. **Context/Background**: 
+- **Rally Ticket**: Link to Rally ticket or issue number
+- **Business Details**: Relevant business context and requirements
+- **Related Issues**: Any related tickets or dependencies
 
-4. **Testing**: Suggest what testing should be done
+### 4. **Implementation Details**: 
+- **Walkthrough**: Step-by-step explanation of what was implemented
+- **Architecture**: Key architectural decisions made
+- **Technical Approach**: How the solution was built
+- **Code Structure**: Overview of new/modified components
 
-5. **Breaking Changes**: Note any breaking changes (if applicable)
+### 5. **How to Test?**: 
+- **Manual Testing**: Step-by-step testing instructions
+- **Automated Tests**: What tests were added/updated
+- **Test Data**: Any special test data or setup required
+- **Edge Cases**: Specific scenarios to test
 
-6. **Dependencies**: Note any new dependencies or changes to existing ones
+### 6. **Impact Areas**: 
+- **Performance**: Any performance implications
+- **Security**: Security considerations
+- **User Experience**: How this affects end users
+- **System Integration**: Impact on other systems
+- **Data**: Any data migration or schema changes
 
-7. **Screenshots/Demos**: Suggest if screenshots or demos would be helpful
+### 7. **Optional Review Notes**: 
+- **Code Quality**: Areas that need special attention
+- **Design Decisions**: Rationale for specific choices
+- **Trade-offs**: Any compromises made and why
+- **Future Considerations**: What might need to be addressed later
 
-8. **Checklist**: Provide a checklist for reviewers
+### 8. **Focus Area for Review**: 
+- **Critical Sections**: Most important code to review
+- **Complex Logic**: Areas with complex business logic
+- **New Dependencies**: New libraries or frameworks used
+- **Configuration Changes**: Any config or environment changes
 
-Please format the output as a proper GitHub PR description with appropriate markdown formatting.`;
+### 9. **Backward Compatibility** (Optional): 
+- **Breaking Changes**: Any breaking changes and migration path
+- **API Changes**: Changes to public APIs
+- **Database Changes**: Schema or data structure changes
+- **Configuration**: Changes to configuration requirements
+
+### 10. **Screenshots** (if applicable): 
+- **UI Changes**: Screenshots of visual changes
+- **Before/After**: Comparison images if relevant
+- **Error States**: Screenshots of error handling
+- **Mobile/Responsive**: Mobile view screenshots if applicable
+
+### 11. **Additional Sections** (as needed):
+- **Dependencies**: New dependencies or version updates
+- **Deployment Notes**: Special deployment considerations
+- **Monitoring**: Any new monitoring or logging added
+- **Documentation**: Documentation that was updated
+
+## Formatting Requirements:
+- Use proper markdown formatting
+- Include emojis for visual appeal (🎯, 📝, 🔧, 🧪, etc.)
+- Use bullet points and numbered lists for clarity
+- Include code blocks for technical details
+- Use tables for structured information
+- Add horizontal rules (---) to separate major sections
+
+Please generate a comprehensive, professional PR description that covers all these areas based on the code changes provided.`;
     }
 
     /**
