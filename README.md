@@ -39,6 +39,13 @@ npm run copilot-review
 # Compare with specific branch
 npx copilot-review main
 npx copilot-review feature/old-branch
+
+# Keep old files (skip cleanup)
+npx copilot-review main --keep-old
+npx copilot-review -k
+
+# Show help
+npx copilot-review --help
 ```
 
 ### After global installation
@@ -51,6 +58,13 @@ copilot-review main
 
 # Compare current branch with any base branch
 copilot-review feature/old-branch
+
+# Keep old files (skip cleanup)
+copilot-review main --keep-old
+copilot-review -k
+
+# Show help
+copilot-review --help
 ```
 
 ### Using npm scripts in your project
@@ -75,16 +89,17 @@ npm run review:develop
 
 ## How It Works
 
-1. **Branch Detection**: Automatically detects your current branch
-2. **Commit Extraction**: Gets all commits between your branch and the base branch
-3. **File Analysis**: Identifies all changed files and their diffs
-4. **File Type Analysis**: Categorizes files by type (JS/TS, Python, Java, etc.)
-5. **Smart Batching**: Groups files into manageable batches based on:
+1. **Cleanup**: Automatically removes old prompt files (unless `--keep-old` is used)
+2. **Branch Detection**: Automatically detects your current branch
+3. **Commit Extraction**: Gets all commits between your branch and the base branch
+4. **File Analysis**: Identifies all changed files and their diffs
+5. **File Type Analysis**: Categorizes files by type (JS/TS, Python, Java, etc.)
+6. **Smart Batching**: Groups files into manageable batches based on:
    - Maximum 5 files per batch
    - Maximum 2000 lines per batch
    - Maximum 1000 lines per file
-6. **Prompt Generation**: Creates structured prompts for VS Code Copilot
-7. **File Output**: Saves all prompts in `./code-review-prompts/` directory
+7. **Prompt Generation**: Creates structured prompts for VS Code Copilot
+8. **File Output**: Saves all prompts in `./code-review-prompts/` directory
 
 ## Output Files
 
@@ -173,6 +188,8 @@ The script automatically excludes:
 4. **Use Summary**: Start with the summary to understand the overall scope
 5. **Iterative Process**: Make changes based on feedback, then regenerate prompts
 6. **Team Workflow**: Share the generated prompts with team members for collaborative review
+7. **Clean Output**: The tool automatically cleans up old files, keeping your workspace organized
+8. **Keep Old Files**: Use `--keep-old` flag if you want to preserve previous prompt files
 
 ## Troubleshooting
 
@@ -192,6 +209,9 @@ The script automatically excludes:
 
 ```
 🚀 Starting Copilot Code Review Generator...
+
+🧹 Cleaning up 5 old prompt files...
+✅ Cleaned up old files
 
 📊 Comparing branches: feature/new-feature → develop
 
@@ -229,11 +249,21 @@ MIT License - see [LICENSE](LICENSE) file for details.
 
 ## Changelog
 
+### 1.2.0
+- Added automatic cleanup of old prompt files
+- Added `--keep-old` and `-k` flags to preserve old files
+- Added `--help` and `-h` flags for usage information
+- Enhanced command-line interface with better argument parsing
+- Improved user experience with cleaner output directory
+
+### 1.1.0
+- Added PR description generation
+- Added file type analysis and categorization
+- Enhanced prompt generation with comprehensive PR templates
+
 ### 1.0.0
 - Initial release
 - Basic branch comparison functionality
 - Smart batching for large changes
 - VS Code Copilot prompt generation
-- PR description generation
-- File type analysis
 - Comprehensive documentation

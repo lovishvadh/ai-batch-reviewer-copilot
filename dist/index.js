@@ -10,14 +10,52 @@ class CodeReviewGenerator {
     }
 
     /**
+     * Show help information
+     */
+    showHelp() {
+        console.log(`
+🚀 Copilot Code Reviewer
+
+Usage:
+  copilot-review [base-branch] [options]
+
+Arguments:
+  base-branch    The base branch to compare against (default: develop)
+
+Options:
+  --keep-old, -k    Keep old prompt files instead of cleaning them up
+  --help, -h        Show this help message
+
+Examples:
+  copilot-review                    # Compare with develop branch
+  copilot-review main               # Compare with main branch
+  copilot-review feature/old-branch # Compare with specific branch
+  copilot-review main --keep-old    # Compare with main, keep old files
+  copilot-review -h                 # Show help
+
+Features:
+  • Generates code review prompts for VS Code Copilot
+  • Creates PR description prompts
+  • Smart batching for large changes
+  • Automatic cleanup of old files
+  • File type analysis and categorization
+`);
+    }
+
+    /**
      * Get command line arguments
      */
     getArguments() {
         const args = process.argv.slice(2);
-        const baseBranch = args[0] || 'develop';
+        
+        // Check for flags
+        const skipCleanup = args.includes('--keep-old') || args.includes('-k');
+        
+        // Filter out flags to get the base branch
+        const baseBranch = args.find(arg => !arg.startsWith('--') && !arg.startsWith('-')) || 'develop';
         const currentBranch = this.getCurrentBranch();
         
-        return { baseBranch, currentBranch };
+        return { baseBranch, currentBranch, skipCleanup };
     }
 
     /**
@@ -362,6 +400,40 @@ Please format the output as a proper GitHub PR description with appropriate mark
     }
 
     /**
+     * Clean up old prompt files
+     */
+    cleanupOldFiles() {
+        const outputDir = './code-review-prompts';
+        
+        if (!fs.existsSync(outputDir)) {
+            return;
+        }
+
+        try {
+            const files = fs.readdirSync(outputDir);
+            const promptFiles = files.filter(file => 
+                file.startsWith('summary-') || 
+                file.startsWith('pr-description-') || 
+                file.startsWith('batch-') || 
+                file.startsWith('instructions-')
+            );
+
+            if (promptFiles.length > 0) {
+                console.log(`🧹 Cleaning up ${promptFiles.length} old prompt files...`);
+                
+                promptFiles.forEach(file => {
+                    const filePath = path.join(outputDir, file);
+                    fs.unlinkSync(filePath);
+                });
+                
+                console.log(`✅ Cleaned up old files\n`);
+            }
+        } catch (error) {
+            console.warn(`⚠️  Warning: Could not clean up old files: ${error.message}`);
+        }
+    }
+
+    /**
      * Save prompt to file
      */
     savePrompt(content, filename) {
@@ -422,9 +494,21 @@ ${batches.map((batch, i) => `
      * Main execution function
      */
     async run() {
+        // Check for help first, before any other processing
+        const args = process.argv.slice(2);
+        if (args.includes('--help') || args.includes('-h')) {
+            this.showHelp();
+            return;
+        }
+
         console.log('🚀 Starting Copilot Code Review Generator...\n');
 
-        const { baseBranch, currentBranch } = this.getArguments();
+        const { baseBranch, currentBranch, skipCleanup } = this.getArguments();
+
+        // Clean up old files first (unless skipped)
+        if (!skipCleanup) {
+            this.cleanupOldFiles();
+        }
         
         console.log(`📊 Comparing branches: ${currentBranch} → ${baseBranch}\n`);
 
